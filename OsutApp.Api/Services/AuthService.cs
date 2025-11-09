@@ -106,7 +106,6 @@ public class AuthService(
             expires: DateTime.Now.AddMinutes(15),
             signingCredentials: creds);
 
-        // Generate new refresh token
         var newRefreshToken = Guid.NewGuid().ToString("N");
         storedToken.IsRevoked = true;
         await _refreshTokenRepository.UpdateAsync(storedToken);

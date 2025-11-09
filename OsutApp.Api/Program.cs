@@ -50,7 +50,14 @@ public class Program
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         builder.Services.AddScoped<IMemberWhitelistRepository, MemberWhitelistRepository>();
+        builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+        builder.Services.AddScoped<IEventRepository, EventRepository>();
+        builder.Services.AddScoped<IEventSignupRepository, EventSignupRepository>();
+        builder.Services.AddScoped<IBoardMemberRepository, BoardMemberRepository>();
         builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+        builder.Services.AddScoped<IEventService, EventService>();
+        builder.Services.AddScoped<IBoardMemberService, BoardMemberService>();
 
         var app = builder.Build();
 
