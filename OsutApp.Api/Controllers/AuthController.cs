@@ -32,17 +32,25 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
     {
         var result = await _authService.RefreshAsync(request.RefreshToken);
+
         if (!result.Success)
         {
             return Unauthorized(result.ErrorMessage);
         }
-        return Ok(new { AccessToken = result.AccessToken, RefreshToken = result.RefreshToken });
+
+        return Ok(new { result.AccessToken, result.RefreshToken });
     }
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
     {
         var success = await _authService.LogoutAsync(request.RefreshToken);
+
+        if (!success)
+        {
+            return BadRequest("Logout failed");
+        }
+
         return Ok("Logged out");
     }
 }

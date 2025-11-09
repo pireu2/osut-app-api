@@ -41,6 +41,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IUser
         };
 
         await _departmentRepository.AddAsync(department);
+
         return department;
     }
 
@@ -79,6 +80,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IUser
         }
 
         await _departmentRepository.UpdateAsync(department);
+
         return department;
     }
 
@@ -92,6 +94,7 @@ public class DepartmentService(IDepartmentRepository departmentRepository, IUser
         }
 
         await _departmentRepository.DeleteAsync(department);
+
         return true;
     }
 }

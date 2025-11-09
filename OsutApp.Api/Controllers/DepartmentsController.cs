@@ -17,6 +17,7 @@ public class DepartmentsController(
     public async Task<IActionResult> GetAllDepartments()
     {
         var departments = await _departmentService.GetAllDepartmentsAsync();
+
         return Ok(departments);
     }
 
@@ -24,10 +25,12 @@ public class DepartmentsController(
     public async Task<IActionResult> GetDepartment(Guid id)
     {
         var department = await _departmentService.GetDepartmentByIdAsync(id);
+
         if (department == null)
         {
             return NotFound();
         }
+
         return Ok(department);
     }
 
@@ -35,6 +38,7 @@ public class DepartmentsController(
     public async Task<IActionResult> GetDepartmentsByType(DepartmentType type)
     {
         var departments = await _departmentService.GetDepartmentsByTypeAsync(type);
+
         return Ok(departments);
     }
 

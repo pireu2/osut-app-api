@@ -14,6 +14,7 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _userService.GetAllUsersAsync();
+
         return Ok(users);
     }
 
@@ -21,10 +22,12 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<IActionResult> GetUserById(string id)
     {
         var user = await _userService.GetUserByIdAsync(id);
+
         if (user == null)
         {
             return NotFound();
         }
+
         return Ok(user);
     }
 
@@ -35,7 +38,9 @@ public class UsersController(IUserService userService) : ControllerBase
         {
             return BadRequest();
         }
+
         await _userService.UpdateUserAsync(user);
+
         return NoContent();
     }
 
@@ -43,6 +48,7 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<IActionResult> DeleteUser(string id)
     {
         await _userService.DeleteUserAsync(id);
+
         return NoContent();
     }
 }

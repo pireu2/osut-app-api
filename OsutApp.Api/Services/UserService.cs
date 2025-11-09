@@ -30,6 +30,7 @@ public class UserService(IUserRepository userRepository) : IUserService
     public async Task DeleteUserAsync(string id)
     {
         var user = await _userRepository.GetByIdAsync(id);
+
         if (user != null)
         {
             await _userRepository.DeleteAsync(user);

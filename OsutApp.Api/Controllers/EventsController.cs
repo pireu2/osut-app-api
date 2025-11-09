@@ -17,6 +17,7 @@ public class EventsController(
     public async Task<IActionResult> GetAllEvents()
     {
         var events = await _eventService.GetAllEventsAsync();
+
         return Ok(events);
     }
 
@@ -24,6 +25,7 @@ public class EventsController(
     public async Task<IActionResult> GetUpcomingEvents()
     {
         var events = await _eventService.GetUpcomingEventsAsync();
+
         return Ok(events);
     }
 
@@ -31,10 +33,12 @@ public class EventsController(
     public async Task<IActionResult> GetEvent(Guid id)
     {
         var eventEntity = await _eventService.GetEventByIdAsync(id);
+
         if (eventEntity == null)
         {
             return NotFound();
         }
+
         return Ok(eventEntity);
     }
 
@@ -42,6 +46,7 @@ public class EventsController(
     public async Task<IActionResult> GetEventsByDepartment(Guid departmentId)
     {
         var events = await _eventService.GetEventsByDepartmentAsync(departmentId);
+
         return Ok(events);
     }
 
@@ -90,6 +95,7 @@ public class EventsController(
     public async Task<IActionResult> DeleteEvent(Guid id)
     {
         var success = await _eventService.DeleteEventAsync(id);
+
         if (!success)
         {
             return NotFound();
@@ -102,6 +108,7 @@ public class EventsController(
     public async Task<IActionResult> SignupForEvent(Guid eventId)
     {
         var userId = User.FindFirst("sub")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
         if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized();
@@ -126,12 +133,14 @@ public class EventsController(
     public async Task<IActionResult> CancelSignup(Guid eventId)
     {
         var userId = User.FindFirst("sub")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
         if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized();
         }
 
         var success = await _eventService.CancelSignupAsync(eventId, userId);
+
         if (!success)
         {
             return NotFound("Signup not found");
@@ -145,6 +154,7 @@ public class EventsController(
     public async Task<IActionResult> GetEventSignups(Guid eventId)
     {
         var signups = await _eventService.GetEventSignupsAsync(eventId);
+
         return Ok(signups);
     }
 }

@@ -22,13 +22,4 @@ public class EventSignup
 
     [Required]
     public DateTime SignupDate { get; set; } = DateTime.UtcNow;
-
-    public EventSignupStatus Status { get; set; } = EventSignupStatus.Pending;
-}
-
-public enum EventSignupStatus
-{
-    Pending,
-    Confirmed,
-    Cancelled
 }

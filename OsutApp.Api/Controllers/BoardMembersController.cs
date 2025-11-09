@@ -17,6 +17,7 @@ public class BoardMembersController(
     public async Task<IActionResult> GetAllBoardMembers()
     {
         var boardMembers = await _boardMemberService.GetAllBoardMembersAsync();
+
         return Ok(boardMembers);
     }
 
@@ -24,10 +25,12 @@ public class BoardMembersController(
     public async Task<IActionResult> GetBoardMember(Guid id)
     {
         var boardMember = await _boardMemberService.GetBoardMemberByIdAsync(id);
+
         if (boardMember == null)
         {
             return NotFound();
         }
+
         return Ok(boardMember);
     }
 
@@ -35,10 +38,12 @@ public class BoardMembersController(
     public async Task<IActionResult> GetBoardMemberByPosition(BoardPosition position)
     {
         var boardMember = await _boardMemberService.GetBoardMemberByPositionAsync(position);
+
         if (boardMember == null)
         {
             return NotFound();
         }
+
         return Ok(boardMember);
     }
 
@@ -46,20 +51,13 @@ public class BoardMembersController(
     public async Task<IActionResult> GetBoardMemberByUser(string userId)
     {
         var boardMember = await _boardMemberService.GetBoardMemberByUserIdAsync(userId);
+
         if (boardMember == null)
         {
             return NotFound();
         }
-        return Ok(boardMember);
-    }
 
-    [HttpGet("positions")]
-    public IActionResult GetBoardPositions()
-    {
-        var positions = Enum.GetValues<BoardPosition>()
-            .Cast<BoardPosition>()
-            .Select(p => new { Value = (int)p, Name = p.ToString() });
-        return Ok(positions);
+        return Ok(boardMember);
     }
 
     [HttpPost]
@@ -89,10 +87,12 @@ public class BoardMembersController(
         try
         {
             var boardMember = await _boardMemberService.UpdateBoardMemberPositionAsync(id, request.Position);
+
             if (boardMember == null)
             {
                 return NotFound();
             }
+
             return Ok(boardMember);
         }
         catch (InvalidOperationException ex)
@@ -105,10 +105,12 @@ public class BoardMembersController(
     public async Task<IActionResult> RemoveBoardMember(Guid id)
     {
         var success = await _boardMemberService.RemoveBoardMemberAsync(id);
+
         if (!success)
         {
             return NotFound();
         }
+
         return NoContent();
     }
 }

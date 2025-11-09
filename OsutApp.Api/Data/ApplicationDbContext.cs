@@ -10,7 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(modelBuilder);
 
-        // Add unique constraint on BoardMember.Position
+        // unique constraint on BoardMember.Position
         modelBuilder.Entity<BoardMember>()
             .HasIndex(b => b.Position)
             .IsUnique();

@@ -31,6 +31,7 @@ public class AuthService(
         }
 
         var user = await _userRepository.GetByEmailAsync(payload.Email);
+
         if (user == null)
         {
             user = new User
@@ -128,12 +129,14 @@ public class AuthService(
     public async Task<bool> LogoutAsync(string refreshToken)
     {
         var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+
         if (token != null)
         {
             token.IsRevoked = true;
             await _refreshTokenRepository.UpdateAsync(token);
             return true;
         }
+
         return false;
     }
 }

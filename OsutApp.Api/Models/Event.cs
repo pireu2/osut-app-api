@@ -25,6 +25,5 @@ public class Event
     [ForeignKey("DepartmentId")]
     public Department? Department { get; set; }
 
-    // Navigation property for event signups
-    public ICollection<EventSignup> Signups { get; set; } = new List<EventSignup>();
+    public ICollection<EventSignup> Signups { get; set; } = [];
 }
