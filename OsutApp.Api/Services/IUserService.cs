@@ -10,4 +10,5 @@ public interface IUserService
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
     Task UpdateUserAsync(UserDto userDto);
     Task DeleteUserAsync(string id);
+    Task<bool> IsUserAdminAsync(string userId);
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 using OsutApp.Api.Services;
+using System.Security.Claims;
 
 namespace OsutApp.Api.Controllers;
 
@@ -10,9 +11,11 @@ namespace OsutApp.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 public class BoardMembersController(
-    IBoardMemberService boardMemberService) : ControllerBase
+    IBoardMemberService boardMemberService,
+    IUserService userService) : BaseController
 {
     private readonly IBoardMemberService _boardMemberService = boardMemberService;
+    private readonly IUserService _userService = userService;
 
     [HttpGet]
     public async Task<IActionResult> GetAllBoardMembers()
@@ -66,9 +69,21 @@ public class BoardMembersController(
     {
         try
         {
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
+
+            if (!isAdmin)
+            {
+                return Forbid("Only administrators can assign board members");
+            }
+
             var boardMember = await _boardMemberService.AssignBoardMemberAsync(request);
 
             return CreatedAtAction(nameof(GetBoardMember), new { id = boardMember.Id }, boardMember);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
         catch (ArgumentException ex)
         {
@@ -85,6 +100,14 @@ public class BoardMembersController(
     {
         try
         {
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
+
+            if (!isAdmin)
+            {
+                return Forbid("Only administrators can update board member positions");
+            }
+
             var boardMember = await _boardMemberService.UpdateBoardMemberPositionAsync(id, request);
 
             if (boardMember == null)
@@ -93,6 +116,10 @@ public class BoardMembersController(
             }
 
             return Ok(boardMember);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
         catch (InvalidOperationException ex)
         {
@@ -103,13 +130,28 @@ public class BoardMembersController(
     [HttpDelete("{id}")]
     public async Task<IActionResult> RemoveBoardMember(Guid id)
     {
-        var success = await _boardMemberService.RemoveBoardMemberAsync(id);
-
-        if (!success)
+        try
         {
-            return NotFound();
-        }
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
 
-        return NoContent();
+            if (!isAdmin)
+            {
+                return Forbid("Only administrators can remove board members");
+            }
+
+            var success = await _boardMemberService.RemoveBoardMemberAsync(id);
+
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
     }
 }

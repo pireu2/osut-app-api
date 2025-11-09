@@ -47,4 +47,11 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
             await _userRepository.DeleteAsync(user);
         }
     }
+
+    public async Task<bool> IsUserAdminAsync(string userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+
+        return user?.IsAdmin ?? false;
+    }
 }

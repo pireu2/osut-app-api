@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OsutApp.Api.DTOs;
-using OsutApp.Api.Models;
 using OsutApp.Api.Services;
+using System.Security.Claims;
 
 namespace OsutApp.Api.Controllers;
 
@@ -10,7 +10,7 @@ namespace OsutApp.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 public class EventsController(
-    IEventService eventService) : ControllerBase
+    IEventService eventService) : BaseController
 {
     private readonly IEventService _eventService = eventService;
 
@@ -52,7 +52,7 @@ public class EventsController(
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<IActionResult> CreateEvent([FromBody] EventDto request)
     {
         try
@@ -68,7 +68,7 @@ public class EventsController(
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] EventDto request)
     {
         var eventEntity = await _eventService.UpdateEventAsync(id, request);
@@ -82,7 +82,7 @@ public class EventsController(
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<IActionResult> DeleteEvent(Guid id)
     {
         var success = await _eventService.DeleteEventAsync(id);
@@ -98,18 +98,16 @@ public class EventsController(
     [HttpPost("{eventId}/signup")]
     public async Task<IActionResult> SignupForEvent(Guid eventId)
     {
-        var userId = User.FindFirst("sub")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized();
-        }
-
         try
         {
-            await _eventService.SignupForEventAsync(eventId, userId);
+            var currentUserId = GetCurrentUserId();
+            await _eventService.SignupForEventAsync(eventId, currentUserId.ToString());
 
             return Ok("Successfully signed up for the event");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
         catch (ArgumentException ex) when (ex.Message == "Event not found")
         {
@@ -124,25 +122,26 @@ public class EventsController(
     [HttpDelete("{eventId}/signup")]
     public async Task<IActionResult> CancelSignup(Guid eventId)
     {
-        var userId = User.FindFirst("sub")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        try
+        {
+            var currentUserId = GetCurrentUserId();
+            var success = await _eventService.CancelSignupAsync(eventId, currentUserId.ToString());
 
-        if (string.IsNullOrEmpty(userId))
+            if (!success)
+            {
+                return NotFound("Signup not found");
+            }
+
+            return Ok("Signup cancelled");
+        }
+        catch (UnauthorizedAccessException)
         {
             return Unauthorized();
         }
-
-        var success = await _eventService.CancelSignupAsync(eventId, userId);
-
-        if (!success)
-        {
-            return NotFound("Signup not found");
-        }
-
-        return Ok("Signup cancelled");
     }
 
     [HttpGet("{eventId}/signups")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<IActionResult> GetEventSignups(Guid eventId)
     {
         var signups = await _eventService.GetEventSignupsAsync(eventId);

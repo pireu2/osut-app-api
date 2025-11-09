@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 using OsutApp.Api.Services;
+using System.Security.Claims;
 
 namespace OsutApp.Api.Controllers;
 
@@ -10,9 +11,11 @@ namespace OsutApp.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 public class DepartmentsController(
-    IDepartmentService departmentService) : ControllerBase
+    IDepartmentService departmentService,
+    IUserService userService) : BaseController
 {
     private readonly IDepartmentService _departmentService = departmentService;
+    private readonly IUserService _userService = userService;
 
     [HttpGet]
     public async Task<IActionResult> GetAllDepartments()
@@ -49,9 +52,21 @@ public class DepartmentsController(
     {
         try
         {
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
+
+            if (!isAdmin)
+            {
+                return Forbid("Only administrators can create departments");
+            }
+
             var department = await _departmentService.CreateDepartmentAsync(request);
 
             return CreatedAtAction(nameof(GetDepartment), new { id = department.Id }, department);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
         catch (ArgumentException ex)
         {
@@ -65,6 +80,14 @@ public class DepartmentsController(
     {
         try
         {
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
+
+            if (!isAdmin)
+            {
+                return Forbid("Only administrators can update departments");
+            }
+
             var department = await _departmentService.UpdateDepartmentAsync(id, request);
 
             if (department == null)
@@ -73,6 +96,10 @@ public class DepartmentsController(
             }
 
             return Ok(department);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
         catch (ArgumentException ex)
         {
@@ -84,12 +111,27 @@ public class DepartmentsController(
     [Authorize]
     public async Task<IActionResult> DeleteDepartment(Guid id)
     {
-        var success = await _departmentService.DeleteDepartmentAsync(id);
-        if (!success)
+        try
         {
-            return NotFound();
-        }
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
 
-        return NoContent();
+            if (!isAdmin)
+            {
+                return Forbid("Only administrators can delete departments");
+            }
+
+            var success = await _departmentService.DeleteDepartmentAsync(id);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
     }
 }

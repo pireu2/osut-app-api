@@ -1,12 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OsutApp.Api.DTOs;
 using OsutApp.Api.Services;
+using System.Security.Claims;
 
 namespace OsutApp.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(IUserService userService) : ControllerBase
+[Authorize]
+public class UsersController(IUserService userService) : BaseController
 {
     private readonly IUserService _userService = userService;
 
@@ -32,6 +35,7 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> UpdateUser(string id, [FromBody] UserDto userDto)
     {
         if (id != userDto.Id)
@@ -39,16 +43,49 @@ public class UsersController(IUserService userService) : ControllerBase
             return BadRequest();
         }
 
-        await _userService.UpdateUserAsync(userDto);
+        try
+        {
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
+            var isOwner = currentUserId.ToString() == id;
 
-        return NoContent();
+            if (!isAdmin && !isOwner)
+            {
+                return Forbid("Only administrators or the account owner can update users");
+            }
+
+            await _userService.UpdateUserAsync(userDto);
+
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<IActionResult> DeleteUser(string id)
     {
-        await _userService.DeleteUserAsync(id);
+        try
+        {
+            var currentUserId = GetCurrentUserId();
+            var isAdmin = await _userService.IsUserAdminAsync(currentUserId.ToString());
+            var isOwner = currentUserId.ToString() == id;
 
-        return NoContent();
+            if (!isAdmin && !isOwner)
+            {
+                return Forbid("Only administrators or the account owner can delete users");
+            }
+
+            await _userService.DeleteUserAsync(id);
+
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
     }
 }
