@@ -33,9 +33,51 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
 
     public async Task UpdateUserAsync(UserDto userDto)
     {
-        var user = _mapper.Map<User>(userDto);
+        var existingUser = await _userRepository.GetByIdAsync(userDto.Id!);
 
-        await _userRepository.UpdateAsync(user);
+        if (existingUser == null)
+        {
+            throw new ArgumentException("User not found");
+        }
+
+        if (!string.IsNullOrEmpty(userDto.FirstName))
+        {
+            existingUser.FirstName = userDto.FirstName;
+        }
+
+        if (!string.IsNullOrEmpty(userDto.LastName))
+        {
+            existingUser.LastName = userDto.LastName;
+        }
+
+        if (userDto.YearOfBirth.HasValue)
+        {
+            existingUser.YearOfBirth = userDto.YearOfBirth;
+        }
+
+        if (!string.IsNullOrEmpty(userDto.ProfilePictureUrl))
+        {
+            existingUser.ProfilePictureUrl = userDto.ProfilePictureUrl;
+        }
+
+        if (!string.IsNullOrEmpty(userDto.Status))
+        {
+            existingUser.Status = Enum.Parse<VolunteerStatus>(userDto.Status);
+        }
+
+        existingUser.IsAdmin = userDto.IsAdmin;
+
+        if (!string.IsNullOrEmpty(userDto.Email))
+        {
+            existingUser.Email = userDto.Email;
+        }
+
+        if (!string.IsNullOrEmpty(userDto.UserName))
+        {
+            existingUser.UserName = userDto.UserName;
+        }
+
+        await _userRepository.UpdateAsync(existingUser);
     }
 
     public async Task DeleteUserAsync(string id)
