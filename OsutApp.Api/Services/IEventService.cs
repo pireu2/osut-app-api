@@ -1,18 +1,19 @@
+using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 
 namespace OsutApp.Api.Services;
 
 public interface IEventService
 {
-    Task<IEnumerable<Event>> GetAllEventsAsync();
-    Task<IEnumerable<Event>> GetUpcomingEventsAsync();
-    Task<Event?> GetEventByIdAsync(Guid id);
-    Task<IEnumerable<Event>> GetEventsByDepartmentAsync(Guid departmentId);
-    Task<Event> CreateEventAsync(string title, string? description, DateTime dateTime, string location, Guid departmentId);
-    Task<Event?> UpdateEventAsync(Guid id, string? title, string? description, DateTime? dateTime, string? location);
+    Task<IEnumerable<EventDto>> GetAllEventsAsync();
+    Task<IEnumerable<EventDto>> GetUpcomingEventsAsync();
+    Task<EventDto?> GetEventByIdAsync(Guid id);
+    Task<IEnumerable<EventDto>> GetEventsByDepartmentAsync(Guid departmentId);
+    Task<EventDto> CreateEventAsync(EventDto eventDto);
+    Task<EventDto?> UpdateEventAsync(Guid id, EventDto eventDto);
     Task<bool> DeleteEventAsync(Guid id);
     Task<bool> SignupForEventAsync(Guid eventId, string userId);
     Task<bool> CancelSignupAsync(Guid eventId, string userId);
-    Task<IEnumerable<EventSignup>> GetEventSignupsAsync(Guid eventId);
-    Task<IEnumerable<EventSignup>> GetUserSignupsAsync(string userId);
+    Task<IEnumerable<EventSignupDto>> GetEventSignupsAsync(Guid eventId);
+    Task<IEnumerable<EventSignupDto>> GetUserSignupsAsync(string userId);
 }

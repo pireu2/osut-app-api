@@ -1,13 +1,14 @@
+using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 
 namespace OsutApp.Api.Services;
 
 public interface IDepartmentService
 {
-    Task<IEnumerable<Department>> GetAllDepartmentsAsync();
-    Task<Department?> GetDepartmentByIdAsync(Guid id);
-    Task<IEnumerable<Department>> GetDepartmentsByTypeAsync(DepartmentType type);
-    Task<Department> CreateDepartmentAsync(string name, string? description, DepartmentType type, string coordinatorId);
-    Task<Department?> UpdateDepartmentAsync(Guid id, string? name, string? description, DepartmentType? type, string? coordinatorId);
+    Task<IEnumerable<DepartmentDto>> GetAllDepartmentsAsync();
+    Task<DepartmentDto?> GetDepartmentByIdAsync(Guid id);
+    Task<IEnumerable<DepartmentDto>> GetDepartmentsByTypeAsync(DepartmentType type);
+    Task<DepartmentDto> CreateDepartmentAsync(DepartmentDto departmentDto);
+    Task<DepartmentDto?> UpdateDepartmentAsync(Guid id, DepartmentDto departmentDto);
     Task<bool> DeleteDepartmentAsync(Guid id);
 }

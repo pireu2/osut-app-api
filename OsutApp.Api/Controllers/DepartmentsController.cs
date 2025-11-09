@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 using OsutApp.Api.Services;
 
@@ -44,15 +45,11 @@ public class DepartmentsController(
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentRequest request)
+    public async Task<IActionResult> CreateDepartment([FromBody] DepartmentDto request)
     {
         try
         {
-            var department = await _departmentService.CreateDepartmentAsync(
-                request.Name,
-                request.Description,
-                request.Type,
-                request.CoordinatorId);
+            var department = await _departmentService.CreateDepartmentAsync(request);
 
             return CreatedAtAction(nameof(GetDepartment), new { id = department.Id }, department);
         }
@@ -64,16 +61,11 @@ public class DepartmentsController(
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<IActionResult> UpdateDepartment(Guid id, [FromBody] UpdateDepartmentRequest request)
+    public async Task<IActionResult> UpdateDepartment(Guid id, [FromBody] DepartmentDto request)
     {
         try
         {
-            var department = await _departmentService.UpdateDepartmentAsync(
-                id,
-                request.Name,
-                request.Description,
-                request.Type,
-                request.CoordinatorId);
+            var department = await _departmentService.UpdateDepartmentAsync(id, request);
 
             if (department == null)
             {
@@ -100,20 +92,4 @@ public class DepartmentsController(
 
         return NoContent();
     }
-}
-
-public class CreateDepartmentRequest
-{
-    public required string Name { get; set; }
-    public string? Description { get; set; }
-    public required DepartmentType Type { get; set; }
-    public required string CoordinatorId { get; set; }
-}
-
-public class UpdateDepartmentRequest
-{
-    public string? Name { get; set; }
-    public string? Description { get; set; }
-    public DepartmentType? Type { get; set; }
-    public string? CoordinatorId { get; set; }
 }

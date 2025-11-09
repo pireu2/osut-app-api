@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 using OsutApp.Api.Services;
 
@@ -61,13 +62,11 @@ public class BoardMembersController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> AssignBoardMember([FromBody] AssignBoardMemberRequest request)
+    public async Task<IActionResult> AssignBoardMember([FromBody] BoardMemberDto request)
     {
         try
         {
-            var boardMember = await _boardMemberService.AssignBoardMemberAsync(
-                request.UserId,
-                request.Position);
+            var boardMember = await _boardMemberService.AssignBoardMemberAsync(request);
 
             return CreatedAtAction(nameof(GetBoardMember), new { id = boardMember.Id }, boardMember);
         }
@@ -82,11 +81,11 @@ public class BoardMembersController(
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBoardMemberPosition(Guid id, [FromBody] UpdateBoardMemberRequest request)
+    public async Task<IActionResult> UpdateBoardMemberPosition(Guid id, [FromBody] BoardMemberDto request)
     {
         try
         {
-            var boardMember = await _boardMemberService.UpdateBoardMemberPositionAsync(id, request.Position);
+            var boardMember = await _boardMemberService.UpdateBoardMemberPositionAsync(id, request);
 
             if (boardMember == null)
             {
@@ -113,15 +112,4 @@ public class BoardMembersController(
 
         return NoContent();
     }
-}
-
-public class AssignBoardMemberRequest
-{
-    public required string UserId { get; set; }
-    public required BoardPosition Position { get; set; }
-}
-
-public class UpdateBoardMemberRequest
-{
-    public required BoardPosition Position { get; set; }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 using OsutApp.Api.Services;
 
@@ -52,16 +53,11 @@ public class EventsController(
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequest request)
+    public async Task<IActionResult> CreateEvent([FromBody] EventDto request)
     {
         try
         {
-            var eventEntity = await _eventService.CreateEventAsync(
-                request.Title,
-                request.Description,
-                request.DateTime,
-                request.Location,
-                request.DepartmentId);
+            var eventEntity = await _eventService.CreateEventAsync(request);
 
             return CreatedAtAction(nameof(GetEvent), new { id = eventEntity.Id }, eventEntity);
         }
@@ -73,14 +69,9 @@ public class EventsController(
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] UpdateEventRequest request)
+    public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] EventDto request)
     {
-        var eventEntity = await _eventService.UpdateEventAsync(
-            id,
-            request.Title,
-            request.Description,
-            request.DateTime,
-            request.Location);
+        var eventEntity = await _eventService.UpdateEventAsync(id, request);
 
         if (eventEntity == null)
         {
@@ -117,6 +108,7 @@ public class EventsController(
         try
         {
             await _eventService.SignupForEventAsync(eventId, userId);
+
             return Ok("Successfully signed up for the event");
         }
         catch (ArgumentException ex) when (ex.Message == "Event not found")
@@ -157,21 +149,4 @@ public class EventsController(
 
         return Ok(signups);
     }
-}
-
-public class CreateEventRequest
-{
-    public required string Title { get; set; }
-    public string? Description { get; set; }
-    public required DateTime DateTime { get; set; }
-    public required string Location { get; set; }
-    public required Guid DepartmentId { get; set; }
-}
-
-public class UpdateEventRequest
-{
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public DateTime? DateTime { get; set; }
-    public string? Location { get; set; }
 }

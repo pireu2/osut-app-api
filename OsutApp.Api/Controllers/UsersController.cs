@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using OsutApp.Api.Models;
+using OsutApp.Api.DTOs;
 using OsutApp.Api.Services;
 
 namespace OsutApp.Api.Controllers;
@@ -32,14 +32,14 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(string id, [FromBody] User user)
+    public async Task<IActionResult> UpdateUser(string id, [FromBody] UserDto userDto)
     {
-        if (id != user.Id)
+        if (id != userDto.Id)
         {
             return BadRequest();
         }
 
-        await _userService.UpdateUserAsync(user);
+        await _userService.UpdateUserAsync(userDto);
 
         return NoContent();
     }

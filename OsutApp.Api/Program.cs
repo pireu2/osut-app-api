@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OsutApp.Api.Data;
+using OsutApp.Api.Mappings;
 using OsutApp.Api.Models;
 using OsutApp.Api.Repositories;
 using OsutApp.Api.Services;
@@ -18,6 +19,8 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
+
+        builder.Services.AddAutoMapper(typeof(MappingProfile));
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

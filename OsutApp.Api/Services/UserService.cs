@@ -1,29 +1,40 @@
+using AutoMapper;
+using OsutApp.Api.DTOs;
 using OsutApp.Api.Models;
 using OsutApp.Api.Repositories;
 
 namespace OsutApp.Api.Services;
 
-public class UserService(IUserRepository userRepository) : IUserService
+public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IMapper _mapper = mapper;
 
-    public async Task<User?> GetUserByIdAsync(string id)
+    public async Task<UserDto?> GetUserByIdAsync(string id)
     {
-        return await _userRepository.GetByIdAsync(id);
+        var user = await _userRepository.GetByIdAsync(id);
+
+        return user != null ? _mapper.Map<UserDto>(user) : null;
     }
 
-    public async Task<User?> GetUserByEmailAsync(string email)
+    public async Task<UserDto?> GetUserByEmailAsync(string email)
     {
-        return await _userRepository.GetByEmailAsync(email);
+        var user = await _userRepository.GetByEmailAsync(email);
+
+        return user != null ? _mapper.Map<UserDto>(user) : null;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync()
+    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        return await _userRepository.GetAllAsync();
+        var users = await _userRepository.GetAllAsync();
+
+        return _mapper.Map<IEnumerable<UserDto>>(users);
     }
 
-    public async Task UpdateUserAsync(User user)
+    public async Task UpdateUserAsync(UserDto userDto)
     {
+        var user = _mapper.Map<User>(userDto);
+
         await _userRepository.UpdateAsync(user);
     }
 
